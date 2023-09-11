@@ -21,7 +21,7 @@ public class PaymentDetails {
 	
 	private Integer bookingNumber;
 	
-	private Double price;
+	private Double amount;
 	
 	private Timestamp paymentDate;
 	

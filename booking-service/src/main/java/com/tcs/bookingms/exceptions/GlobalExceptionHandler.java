@@ -18,5 +18,14 @@ public class GlobalExceptionHandler {
 		return new ErrorResponse(
 				HttpStatus.NOT_FOUND.value(), ex.getMessage());
 	}
-
+	
+	@ExceptionHandler(value
+			= InventoryException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public @ResponseBody ErrorResponse
+	handleException(InventoryException ex)
+	{
+		return new ErrorResponse(
+				HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+	}
 }

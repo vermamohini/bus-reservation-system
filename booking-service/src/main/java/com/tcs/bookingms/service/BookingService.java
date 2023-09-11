@@ -33,32 +33,33 @@ public class BookingService {
 	private final PassengerDetailsRepository passengerDetailsRepository;
 	
 	public void saveBooking(BookingDetails bookingDetails) {
-		BookingStatus bookingStatus = new BookingStatus();
-		bookingStatus.setBookingStatus(BookingStatusEnum.PENDING.toString());
-		bookingStatus.setBookingNumber(bookingDetails.getBusNumber());
-		bookingStatusRepository.save(bookingStatus);
 		bookingDetails.setBookingDate(new Timestamp(System.currentTimeMillis()));
 		bookingDetailsRepository.save(bookingDetails);
+		BookingStatus bookingStatus = new BookingStatus();
+		bookingStatus.setBookingStatus(BookingStatusEnum.PENDING.toString());
+		bookingStatus.setBookingNumber(bookingDetails.getBookingNumber());
+		bookingStatusRepository.save(bookingStatus);
+		
 	}
 	
 	public void cancelBooking(Integer bookingNumber) {
 		BookingDetails bookingDetails = bookingDetailsRepository.findById(bookingNumber)
-				.orElseThrow(() -> new BookingNotFoundException(ERR_MSG_NOT_FOUND));
+				.orElseThrow(() -> new BookingNotFoundException(ERR_MSG_NOT_FOUND + bookingNumber));
 		
 		BookingStatus bookingStatus = new BookingStatus();
 		bookingStatus.setBookingStatus(BookingStatusEnum.CANCELLED.toString());
-		bookingStatus.setBookingNumber(bookingDetails.getBusNumber());
+		bookingStatus.setBookingNumber(bookingDetails.getBookingNumber());
 		bookingStatus.setCreatedDate(new Timestamp(System.currentTimeMillis()));
 		bookingStatusRepository.save(bookingStatus);
 	}
 	
 	public void confirmBooking(Integer bookingNumber) {
 		BookingDetails bookingDetails = bookingDetailsRepository.findById(bookingNumber)
-				.orElseThrow(() -> new BookingNotFoundException(ERR_MSG_NOT_FOUND));
+				.orElseThrow(() -> new BookingNotFoundException(ERR_MSG_NOT_FOUND + bookingNumber));
 		
 		BookingStatus bookingStatus = new BookingStatus();
-		bookingStatus.setBookingStatus(BookingStatusEnum.CANCELLED.toString());
-		bookingStatus.setBookingNumber(bookingDetails.getBusNumber());
+		bookingStatus.setBookingStatus(BookingStatusEnum.CONFIRMED.toString());
+		bookingStatus.setBookingNumber(bookingDetails.getBookingNumber());
 		bookingStatus.setCreatedDate(new Timestamp(System.currentTimeMillis()));
 		bookingStatusRepository.save(bookingStatus);
 		

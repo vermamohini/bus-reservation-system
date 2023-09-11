@@ -19,7 +19,7 @@ public class BookingStatus {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer statusId;
 	
-	private String bookingNumber;
+	private Integer bookingNumber;
 	
 	private String bookingStatus;
 	

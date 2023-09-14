@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class GlobalExceptionHandler {
 	
 	@ExceptionHandler(value
-			= BookingNotFoundException.class)
+			= EntityNotFoundException.class)
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	public @ResponseBody ErrorResponse
-	handleException(BookingNotFoundException ex)
+	handleException(EntityNotFoundException ex)
 	{
 		return new ErrorResponse(
 				HttpStatus.NOT_FOUND.value(), ex.getMessage());

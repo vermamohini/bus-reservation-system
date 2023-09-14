@@ -8,7 +8,6 @@ import static com.tcs.bookingms.constants.MessageConstants.UPDATE_SUCCESS;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,16 +39,9 @@ public class BookingController {
 	@Retry(name = "inventory-api", fallbackMethod = "fallbackDefaultInventory")
 	@GetMapping("/getInventory/{busNumber}")
 	public Integer getAvailableInventory(@PathVariable String busNumber) {
-		try {
-			logger.info("Calling inventory-api for busNumber: {}", busNumber);
-			ResponseEntity<Integer> inventory = busInventoryProxy.getAvailableSeatsByBusNumber(busNumber);
-			return inventory.getBody();
-		} catch (FeignException e) {
-			if (e.status() == HttpStatus.NOT_FOUND.value()) {
-				throw new InventoryException(e.getMessage());
-			}
-			throw e;
-		}
+		logger.info("Calling inventory-api for busNumber: {}", busNumber);
+		ResponseEntity<Integer> inventory = busInventoryProxy.getAvailableSeatsByBusNumber(busNumber);
+		return inventory.getBody();
 	}
 	
 	public Integer fallbackDefaultInventory(FeignException ex) {

@@ -23,7 +23,7 @@ import com.tcs.bookingms.repository.BookingDetailsRepository;
 import com.tcs.bookingms.repository.BookingStatusRepository;
 import com.tcs.bookingms.repository.BusRouteRepository;
 import com.tcs.bookingms.repository.PassengerDetailsRepository;
-import com.tcs.bookingms.vo.PaymentVo;
+import com.tcs.bookingms.vo.BookingVo;
 
 import lombok.RequiredArgsConstructor;
 
@@ -57,13 +57,14 @@ public class BookingService {
 		bookingStatus.setBookingNumber(bookingDetails.getBookingNumber());
 		bookingStatusRepository.save(bookingStatus);
 		
-		PaymentVo paymentVo = new PaymentVo();
+		BookingVo paymentVo = new BookingVo();
 		paymentVo.setBookingNumber(bookingDetails.getBookingNumber());
 		String busNumber = bookingDetails.getBusNumber();
 		BusRoute busRoute = busRouteRepository.findById(busNumber)
 				.orElseThrow(() -> new EntityNotFoundException(ERR_MSG_BUS_NOT_FOUND + busNumber));
 		Double pricePerTicket = busRoute.getPricePerTicket();
 		paymentVo.setAmount(pricePerTicket * bookingDetails.getNoOfSeats());
+		paymentVo.setNoOfSeats(bookingDetails.getNoOfSeats());
 		rabbitTemplate.convertAndSend(exchange, routingKey, paymentVo);
 	}
 	

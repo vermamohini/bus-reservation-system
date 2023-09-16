@@ -1,9 +1,6 @@
 package com.tcs.paymentms.controller;
 
-import static com.tcs.paymentms.constants.ErrorConstants.ERR_MSG_ALREADY_EXISTS;
 import static com.tcs.paymentms.constants.MessageConstants.SAVE_SUCCESS;
-
-import java.sql.Timestamp;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,9 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tcs.paymentms.entities.PaymentDetails;
-import com.tcs.paymentms.exceptions.PaymentAlreadyExistsException;
-import com.tcs.paymentms.repository.PaymentDetailsRepository;
+import com.tcs.paymentms.service.PaymentService;
+import com.tcs.paymentms.vo.BookingVo;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,18 +19,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PaymentController {
 	
-	private final PaymentDetailsRepository paymentDetailsRepository;
+	private final PaymentService paymentService;
+
 	
 	@PostMapping("/payment")
-	public ResponseEntity<?> savePayment(@RequestBody PaymentDetails paymentDetails) {
-		PaymentDetails existingPayment = paymentDetailsRepository.findByBookingNumber(paymentDetails.getBookingNumber());
-		if (existingPayment == null) {
-			paymentDetails.setPaymentDate(new Timestamp(System.currentTimeMillis()));
-			paymentDetailsRepository.save(paymentDetails);
-			return new ResponseEntity<>(SAVE_SUCCESS + paymentDetails.getBookingNumber(), HttpStatus.OK);
-		} else {
-			throw new PaymentAlreadyExistsException(ERR_MSG_ALREADY_EXISTS + paymentDetails.getBookingNumber());
-		}
+	public ResponseEntity<String> savePayment(@RequestBody BookingVo bookingDetails) {
+		paymentService.savePayment(bookingDetails);
+		return new ResponseEntity<>(SAVE_SUCCESS + bookingDetails.getBookingNumber(), HttpStatus.OK);
 	}
 
 }

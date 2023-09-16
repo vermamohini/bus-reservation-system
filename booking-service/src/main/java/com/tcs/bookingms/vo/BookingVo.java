@@ -13,25 +13,27 @@ import lombok.Setter;
 @Component
 @Getter
 @Setter
-@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id", scope = PaymentVo.class)
-public class PaymentVo implements Serializable {
+@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id", scope = BookingVo.class)
+public class BookingVo implements Serializable {
 	
 	private Integer bookingNumber;
 	private Double amount;
+	private Integer noOfSeats;
 	
-	public PaymentVo(Integer bookingNumber, Double amount) {
+	public BookingVo(Integer bookingNumber, Double amount, Integer noOfSeats) {
 		super();
 		this.bookingNumber = bookingNumber;
 		this.amount = amount;
+		this.noOfSeats = noOfSeats;
 	}
 
-	public PaymentVo() {
+	public BookingVo() {
 		super();
 	}
 
 	@Override
 	public String toString() {
-		return "PaymentVo [bookingNumber=" + bookingNumber + ", amount=" + amount + "]";
+		return "PaymentVo [bookingNumber=" + bookingNumber + ", amount=" + amount + ", noOfSeats=" + noOfSeats + "]";
 	}
 	
 }

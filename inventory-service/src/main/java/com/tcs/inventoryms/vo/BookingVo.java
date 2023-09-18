@@ -1,4 +1,4 @@
-package com.tcs.paymentms.vo;
+package com.tcs.inventoryms.vo;
 
 import java.io.Serializable;
 

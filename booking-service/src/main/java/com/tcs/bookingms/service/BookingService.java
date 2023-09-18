@@ -9,7 +9,12 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.annotation.RabbitListenerConfigurer;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.rabbit.listener.RabbitListenerEndpointRegistrar;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +35,9 @@ import lombok.RequiredArgsConstructor;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class BookingService {
+public class BookingService implements RabbitListenerConfigurer {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(BookingService.class);
 	
 	private final BookingDetailsRepository bookingDetailsRepository;
 	
@@ -42,30 +49,44 @@ public class BookingService {
 	
 	private final RabbitTemplate rabbitTemplate;
 	
+	@Override
+    public void configureRabbitListeners(RabbitListenerEndpointRegistrar rabbitListenerEndpointRegistrar) {
+    }
+	
 	@Value("${spring.rabbitmq.exchange}")
 	private String exchange;
 	
-
-	@Value("${spring.rabbitmq.routingkey}")
+	@Value("${spring.rabbitmq.routingkey.bookingpending}")
 	private String routingKey;
 	
+	@Value("${spring.rabbitmq.queue.inventorydebited}")
+	private String inventoryDebitedQueue;
+	
 	public void saveBooking(BookingDetails bookingDetails) {
+		String busNumber = bookingDetails.getBusNumber();
+		BusRoute busRoute = busRouteRepository.findById(busNumber)
+				.orElseThrow(() -> new EntityNotFoundException(ERR_MSG_BUS_NOT_FOUND + busNumber));
+		
+		LOGGER.info("Creating new booking for bus number: {}", busNumber);
 		bookingDetails.setBookingDate(new Timestamp(System.currentTimeMillis()));
 		bookingDetailsRepository.save(bookingDetails);
 		BookingStatus bookingStatus = new BookingStatus();
 		bookingStatus.setBookingStatus(BookingStatusEnum.PENDING.toString());
 		bookingStatus.setBookingNumber(bookingDetails.getBookingNumber());
-		bookingStatusRepository.save(bookingStatus);
+		bookingStatus.setCreatedDate(new Timestamp(System.currentTimeMillis()));
+		bookingStatusRepository.save(bookingStatus);	
 		
-		BookingVo paymentVo = new BookingVo();
-		paymentVo.setBookingNumber(bookingDetails.getBookingNumber());
-		String busNumber = bookingDetails.getBusNumber();
-		BusRoute busRoute = busRouteRepository.findById(busNumber)
-				.orElseThrow(() -> new EntityNotFoundException(ERR_MSG_BUS_NOT_FOUND + busNumber));
 		Double pricePerTicket = busRoute.getPricePerTicket();
-		paymentVo.setAmount(pricePerTicket * bookingDetails.getNoOfSeats());
-		paymentVo.setNoOfSeats(bookingDetails.getNoOfSeats());
-		rabbitTemplate.convertAndSend(exchange, routingKey, paymentVo);
+		
+		BookingVo bookingVo = new BookingVo();
+		bookingVo.setBusNumber(busNumber);
+		bookingVo.setBookingNumber(bookingDetails.getBookingNumber());
+		bookingVo.setAmount(pricePerTicket * bookingDetails.getNoOfSeats());
+		bookingVo.setNoOfSeats(bookingDetails.getNoOfSeats());
+		
+		LOGGER.info ("Inserting event to Exchange: {} with Routing key: {} and message {}:", exchange, routingKey, bookingVo);
+		
+		rabbitTemplate.convertAndSend(exchange, routingKey, bookingVo);
 	}
 	
 	public void cancelBooking(Integer bookingNumber) {
@@ -79,9 +100,16 @@ public class BookingService {
 		bookingStatusRepository.save(bookingStatus);
 	}
 	
-	public void confirmBooking(Integer bookingNumber) {
+	@RabbitListener(queues = "${spring.rabbitmq.queue.inventorydebited}")
+	public void confirmBooking(BookingVo bookingVo) {
+		
+		LOGGER.info ("Received message: {} from event queue: {}", bookingVo, inventoryDebitedQueue);
+		
+		Integer bookingNumber = bookingVo.getBookingNumber();
 		BookingDetails bookingDetails = bookingDetailsRepository.findById(bookingNumber)
 				.orElseThrow(() -> new EntityNotFoundException(ERR_MSG_BOOKING_NOT_FOUND + bookingNumber));
+		
+		LOGGER.info ("Confirming booking for booking number: {}", bookingNumber); 
 		
 		BookingStatus bookingStatus = new BookingStatus();
 		bookingStatus.setBookingStatus(BookingStatusEnum.CONFIRMED.toString());
@@ -89,7 +117,7 @@ public class BookingService {
 		bookingStatus.setCreatedDate(new Timestamp(System.currentTimeMillis()));
 		bookingStatusRepository.save(bookingStatus);
 		
-		int bookedSeats = bookingDetails.getNoOfSeats();
+		int bookedSeats = bookingVo.getNoOfSeats();
 		List<PassengerDetails> passengerDetailsList = new ArrayList<PassengerDetails>();
 		
 		for (int index = 0; index < bookedSeats ; index++) {

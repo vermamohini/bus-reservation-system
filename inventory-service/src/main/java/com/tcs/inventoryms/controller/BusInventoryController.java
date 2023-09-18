@@ -26,6 +26,8 @@ import com.tcs.inventoryms.exceptions.BusInventoryAlreadyExistsException;
 import com.tcs.inventoryms.exceptions.BusInventoryNotFoundException;
 import com.tcs.inventoryms.exceptions.InvalidNoOfSeatsException;
 import com.tcs.inventoryms.repository.BusInventoryRepository;
+import com.tcs.inventoryms.service.InventoryService;
+import com.tcs.inventoryms.vo.BookingVo;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,6 +37,8 @@ import lombok.RequiredArgsConstructor;
 public class BusInventoryController {
 	
 	private final BusInventoryRepository busInventoryRepository;
+	
+	private final InventoryService inventoryService;
 
 	
 	@GetMapping("/busInventory/all")
@@ -99,17 +103,10 @@ public class BusInventoryController {
 		return new ResponseEntity<>(UPDATE_SUCCESS + busNumber, HttpStatus.OK);
 	}
 	
-	@PutMapping("/busInventory/{busNumber}/reduce/{noOfSeats}")
-	public ResponseEntity<?> reducefromBusInventoryByBusNumber(@PathVariable String busNumber, @PathVariable Integer noOfSeats) {
-		if (noOfSeats == null) {
-			new InvalidNoOfSeatsException(ERR_INVALID_NO_OF_SEATS);
-		}
-		BusInventory existingInventory = busInventoryRepository.findById(busNumber)
-                .orElseThrow(()->new BusInventoryNotFoundException(ERR_MSG_NOT_FOUND + busNumber));
-		existingInventory.setAvailableSeats(existingInventory.getAvailableSeats() - noOfSeats);
-		existingInventory.setLastUpdatedDate(new Timestamp(System.currentTimeMillis()));
-		busInventoryRepository.save(existingInventory);
-		return new ResponseEntity<>(UPDATE_SUCCESS + busNumber, HttpStatus.OK);
+	@PostMapping("/busInventory/reduce")
+	public ResponseEntity<?> reducefromBusInventoryByBusNumber(@RequestBody BookingVo bookingVo) {
+		inventoryService.reducefromBusInventoryByBusNumber(bookingVo);
+		return new ResponseEntity<>(UPDATE_SUCCESS + bookingVo.getBusNumber(), HttpStatus.OK);
 	}
 
 }

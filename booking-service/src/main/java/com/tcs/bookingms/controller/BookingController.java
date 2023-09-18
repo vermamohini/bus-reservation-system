@@ -20,6 +20,7 @@ import com.tcs.bookingms.entities.BookingDetails;
 import com.tcs.bookingms.exceptions.InventoryException;
 import com.tcs.bookingms.proxies.BusInventoryProxy;
 import com.tcs.bookingms.service.BookingService;
+import com.tcs.bookingms.vo.BookingVo;
 
 import feign.FeignException;
 import io.github.resilience4j.retry.annotation.Retry;
@@ -75,10 +76,10 @@ public class BookingController {
 		return ResponseEntity.ok().body(UPDATE_SUCCESS + bookingNumber);
 	}
 	
-	@PostMapping("/confirmBooking/{bookingNumber}")
-	public ResponseEntity<String> confirmBooking(@PathVariable Integer bookingNumber) {
-		bookingService.confirmBooking(bookingNumber);
-		return ResponseEntity.ok().body(UPDATE_SUCCESS + bookingNumber);
+	@PostMapping("/confirmBooking")
+	public ResponseEntity<String> confirmBooking(@RequestBody BookingVo bookingVo) {
+		bookingService.confirmBooking(bookingVo);
+		return ResponseEntity.ok().body(UPDATE_SUCCESS + bookingVo.getBookingNumber());
 	}
 
 }

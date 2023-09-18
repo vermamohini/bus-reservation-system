@@ -16,12 +16,14 @@ import lombok.Setter;
 @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id", scope = BookingVo.class)
 public class BookingVo implements Serializable {
 	
+	private String busNumber;
 	private Integer bookingNumber;
 	private Double amount;
 	private Integer noOfSeats;
 	
-	public BookingVo(Integer bookingNumber, Double amount, Integer noOfSeats) {
+	public BookingVo(String busNumber, Integer bookingNumber, Double amount, Integer noOfSeats) {
 		super();
+		this.busNumber = busNumber;
 		this.bookingNumber = bookingNumber;
 		this.amount = amount;
 		this.noOfSeats = noOfSeats;
@@ -33,7 +35,7 @@ public class BookingVo implements Serializable {
 
 	@Override
 	public String toString() {
-		return "PaymentVo [bookingNumber=" + bookingNumber + ", amount=" + amount + ", noOfSeats=" + noOfSeats + "]";
+		return "BookingVo [busNumber=" + busNumber + ", bookingNumber=" + bookingNumber + ", amount=" + amount + ", noOfSeats=" + noOfSeats + "]";
 	}
 	
 }

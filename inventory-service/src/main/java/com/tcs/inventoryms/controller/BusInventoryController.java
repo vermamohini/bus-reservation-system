@@ -1,6 +1,5 @@
 package com.tcs.inventoryms.controller;
 
-import static com.tcs.inventoryms.constants.ErrorConstants.ERR_INVALID_NO_OF_SEATS;
 import static com.tcs.inventoryms.constants.ErrorConstants.ERR_MSG_ALREADY_EXISTS;
 import static com.tcs.inventoryms.constants.ErrorConstants.ERR_MSG_NOT_FOUND;
 import static com.tcs.inventoryms.constants.MessageConstants.DELETE_SUCCESS;
@@ -24,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.tcs.inventoryms.entities.BusInventory;
 import com.tcs.inventoryms.exceptions.BusInventoryAlreadyExistsException;
 import com.tcs.inventoryms.exceptions.BusInventoryNotFoundException;
-import com.tcs.inventoryms.exceptions.InvalidNoOfSeatsException;
 import com.tcs.inventoryms.repository.BusInventoryRepository;
 import com.tcs.inventoryms.service.InventoryService;
 import com.tcs.inventoryms.vo.BookingVo;
@@ -90,17 +88,10 @@ public class BusInventoryController {
 		return new ResponseEntity<>(DELETE_SUCCESS + busNumber, HttpStatus.OK);
 	}
 	
-	@PutMapping("/busInventory/{busNumber}/add/{noOfSeats}")
-	public ResponseEntity<?> addToBusInventoryByBusNumber(@PathVariable String busNumber, @PathVariable Integer noOfSeats) {
-		if (noOfSeats == null) {
-			new InvalidNoOfSeatsException(ERR_INVALID_NO_OF_SEATS);
-		}
-		BusInventory existingInventory = busInventoryRepository.findById(busNumber)
-                .orElseThrow(()->new BusInventoryNotFoundException(ERR_MSG_NOT_FOUND + busNumber));
-		existingInventory.setAvailableSeats(existingInventory.getAvailableSeats() + noOfSeats);
-		existingInventory.setLastUpdatedDate(new Timestamp(System.currentTimeMillis()));
-		busInventoryRepository.save(existingInventory);
-		return new ResponseEntity<>(UPDATE_SUCCESS + busNumber, HttpStatus.OK);
+	@PutMapping("/busInventory/add")
+	public ResponseEntity<?> addToBusInventoryByBusNumber(@RequestBody BookingVo bookingVo) {
+		inventoryService.addToBusInventoryByBusNumber(bookingVo);
+		return new ResponseEntity<>(UPDATE_SUCCESS + bookingVo.getBusNumber(), HttpStatus.OK);
 	}
 	
 	@PostMapping("/busInventory/reduce")

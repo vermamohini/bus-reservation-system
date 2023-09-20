@@ -2,9 +2,10 @@ package com.tcs.bookingms.controller;
 
 import static com.tcs.bookingms.constants.ErrorConstants.ERR_INSUFFICIENT_INVENTORY;
 import static com.tcs.bookingms.constants.ErrorConstants.ERR_INSUFFICIENT_INVENTORY_CONTD;
+import static com.tcs.bookingms.constants.MessageConstants.CANCEL_SUCCESS;
+import static com.tcs.bookingms.constants.MessageConstants.CONFIRM_SUCCESS;
 import static com.tcs.bookingms.constants.MessageConstants.SAVE_SUCCESS;
 import static com.tcs.bookingms.constants.MessageConstants.SAVE_SUCCESS_CONTD;
-import static com.tcs.bookingms.constants.MessageConstants.UPDATE_SUCCESS;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,16 +71,16 @@ public class BookingController {
 		
 	}
 	
-	@PostMapping("/cancelBooking/{bookingNumber}")
-	public ResponseEntity<String> cancelBooking(@PathVariable Integer bookingNumber) {
-		bookingService.cancelBooking(bookingNumber);
-		return ResponseEntity.ok().body(UPDATE_SUCCESS + bookingNumber);
+	@PostMapping("/cancelBooking")
+	public ResponseEntity<String> cancelBooking(@RequestBody BookingVo bookingVo) {
+		bookingService.cancelBooking(bookingVo);
+		return ResponseEntity.ok().body(CANCEL_SUCCESS + bookingVo.getBookingNumber());
 	}
 	
 	@PostMapping("/confirmBooking")
 	public ResponseEntity<String> confirmBooking(@RequestBody BookingVo bookingVo) {
 		bookingService.confirmBooking(bookingVo);
-		return ResponseEntity.ok().body(UPDATE_SUCCESS + bookingVo.getBookingNumber());
+		return ResponseEntity.ok().body(CONFIRM_SUCCESS + bookingVo.getBookingNumber());
 	}
 
 }

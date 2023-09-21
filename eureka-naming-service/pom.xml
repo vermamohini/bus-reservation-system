@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.tcs</groupId>
 	<artifactId>eureka-naming-service</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>test-1.0</version>
 	<name>eureka-naming-service</name>
 	<description>Naming service for service registration and discovery</description>
 	<properties>

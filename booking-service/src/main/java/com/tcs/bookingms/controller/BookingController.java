@@ -32,7 +32,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class BookingController {
 	
-	private Logger logger = LoggerFactory.getLogger(BookingController.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(BookingController.class);
 	
 	private final BusInventoryProxy busInventoryProxy;
 	
@@ -41,14 +41,14 @@ public class BookingController {
 	@Retry(name = "inventory-api", fallbackMethod = "fallbackDefaultInventory")
 	@GetMapping("/getInventory/{busNumber}")
 	public Integer getAvailableInventory(@PathVariable String busNumber) {
-		logger.info("Calling inventory-api for busNumber: {}", busNumber);
+		LOGGER.info("Calling inventory-api for busNumber: {}", busNumber);
 		ResponseEntity<Integer> inventory = busInventoryProxy.getAvailableSeatsByBusNumber(busNumber);
 		return inventory.getBody();
 	}
 	
 	public Integer fallbackDefaultInventory(FeignException ex) {
 		int defaultInventory = 0;
-		logger.info("Returning fallback default Inventory: {}", defaultInventory);
+		LOGGER.info("Returning fallback default Inventory: {}", defaultInventory);
 		return defaultInventory;
 	}
 	

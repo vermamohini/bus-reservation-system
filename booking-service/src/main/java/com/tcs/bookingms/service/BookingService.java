@@ -81,8 +81,11 @@ public class BookingService implements RabbitListenerConfigurer {
 		LOGGER.info("Creating new booking for bus number: {}", busNumber);
 		bookingDetails.setBookingDate(new Timestamp(System.currentTimeMillis()));
 		bookingDetailsRepository.save(bookingDetails);
+		
+		String bookingStatusStr = BookingStatusEnum.PENDING.toString();
+		LOGGER.info("Setting booking status for bus number: {} to {}", busNumber, bookingStatusStr);
 		BookingStatus bookingStatus = new BookingStatus();
-		bookingStatus.setBookingStatus(BookingStatusEnum.PENDING.toString());
+		bookingStatus.setBookingStatus(bookingStatusStr);
 		bookingStatus.setBookingNumber(bookingDetails.getBookingNumber());
 		bookingStatus.setCreatedDate(new Timestamp(System.currentTimeMillis()));
 		bookingStatusRepository.save(bookingStatus);	
@@ -141,6 +144,8 @@ public class BookingService implements RabbitListenerConfigurer {
 			bookingStatus.setCreatedDate(new Timestamp(System.currentTimeMillis()));
 			bookingStatusRepository.save(bookingStatus);
 
+			LOGGER.info("Adding passenger details for booking number: {}", bookingNumber);
+
 			int bookedSeats = bookingVo.getNoOfSeats();
 			List<PassengerDetails> passengerDetailsList = new ArrayList<PassengerDetails>();
 
@@ -152,7 +157,10 @@ public class BookingService implements RabbitListenerConfigurer {
 			}
 			passengerDetailsRepository.saveAll(passengerDetailsList);
 			
-		} catch (final Exception ex) {
+		} catch (final EntityNotFoundException ex) {
+			LOGGER.info("Exception in Confirming booking for booking details: {}. Exception encountered : {}", bookingVo, ex);
+			throw ex;
+		}	catch (final Exception ex) {
 			LOGGER.info("Exception in Confirming booking for booking details: {}. Exception encountered : {}", bookingVo, ex);
 			
 			rejectBookingStatus(bookingVo);	
@@ -167,16 +175,22 @@ public class BookingService implements RabbitListenerConfigurer {
 	}
 
 	public void rejectBookingStatus(BookingVo bookingVo) {
-		LOGGER.info("Rejecting booking for booking number: {}", bookingVo.getBookingNumber());
+		Integer bookingNumber = bookingVo.getBookingNumber();
+		BookingDetails bookingDetails = bookingDetailsRepository.findById(bookingNumber)
+				.orElseThrow(() -> new EntityNotFoundException(ERR_MSG_BOOKING_NOT_FOUND + bookingNumber));
+		
+		LOGGER.info("Rejecting booking for booking number: {}", bookingNumber);
 
 		BookingStatus bookingStatus = new BookingStatus();
 		bookingStatus.setBookingStatus(BookingStatusEnum.REJECTED.toString());
-		bookingStatus.setBookingNumber(bookingVo.getBookingNumber());
+		bookingStatus.setBookingNumber(bookingDetails.getBookingNumber());
 		bookingStatus.setCreatedDate(new Timestamp(System.currentTimeMillis()));
 		bookingStatusRepository.save(bookingStatus);
 	}
 	
 	public void triggerRollbackEvent(BookingVo bookingVo) {
+		LOGGER.info("Triggering rollback of transactions for booking number: {}", bookingVo.getBookingNumber());
+		
 		LOGGER.info("Inserting event to Exchange: {} with Routing key: {} and message {}:", exchange, routingKeyPaymentRollback, bookingVo);
 		rabbitTemplate.convertAndSend(exchange, routingKeyPaymentRollback, bookingVo);
 		

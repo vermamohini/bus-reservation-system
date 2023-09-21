@@ -20,17 +20,29 @@ public class RabbitMqConfig {
     @Value("${spring.rabbitmq.exchange}")
     private String exchange;
 
-	@Value("${spring.rabbitmq.queue.bookingpending}")
-    private String bookingPendingQueue;
+	@Value("${spring.rabbitmq.queue.inventory.debit}")
+	private String inventoryDebitQueue;
+
+	@Value("${spring.rabbitmq.routingkey.inventory.debit}")
+	private String routingKeyInventoryDebit;
     
-    @Value("${spring.rabbitmq.routingkey.bookingpending}")
-    private String routingKeyBookingPendingQueue;
-    
-	@Value("${spring.rabbitmq.queue.paymentprocessed}")
-    private String paymentProcessedQueue;
-    
-    @Value("${spring.rabbitmq.routingkey.paymentprocessed}")
-    private String routingKeyPaymentProcessedQueue;
+	@Value("${spring.rabbitmq.queue.booking.reject}")
+	private String bookingRejectQueue;
+
+	@Value("${spring.rabbitmq.routingkey.booking.reject}")
+	private String routingKeyBookingReject;
+
+	@Value("${spring.rabbitmq.queue.payment.process}")
+	private String paymentProcessQueue;
+
+	@Value("${spring.rabbitmq.routingkey.payment.process}")
+	private String routingKeyPaymentProcess;
+	
+	@Value("${spring.rabbitmq.queue.payment.rollback}")
+	private String paymentRollbackQueue;
+
+	@Value("${spring.rabbitmq.routingkey.payment.rollback}")
+	private String routingKeyPaymentRollback;
     
     @Value("${spring.rabbitmq.username}")
     private String username;
@@ -40,14 +52,24 @@ public class RabbitMqConfig {
     private String host;
     
     @Bean
-    Queue queue() {
-        return new Queue(bookingPendingQueue, true);
+    Queue inventoryDebitQueue() {
+        return new Queue(inventoryDebitQueue, true);
     }
     
     @Bean
-    Queue paymentProcessedQueue() {
-        return new Queue(paymentProcessedQueue, true);
+    Queue bookingRejectQueue() {
+        return new Queue(bookingRejectQueue, true);
     }
+    
+	@Bean
+	Queue paymentProcessQueue() {
+		return new Queue(paymentProcessQueue, true);
+	}
+    
+	@Bean
+	Queue paymentRollbackQueue() {
+		return new Queue(paymentRollbackQueue, true);
+	}
     
     @Bean
     Exchange busRouteExchange() {
@@ -55,23 +77,27 @@ public class RabbitMqConfig {
     }
     
     @Bean
-    Binding binding() {
-        return BindingBuilder
-                .bind(queue())
-                .to(busRouteExchange())
-                .with(routingKeyBookingPendingQueue)
-                .noargs();
+    Binding inventoryDebitBinding() {
+		return BindingBuilder.bind(inventoryDebitQueue()).to(busRouteExchange()).with(routingKeyInventoryDebit)
+				.noargs();
     }
     
     @Bean
-    Binding paymentProcessedBinding() {
-        return BindingBuilder
-                .bind(paymentProcessedQueue())
-                .to(busRouteExchange())
-                .with(routingKeyPaymentProcessedQueue)
-                .noargs();
+    Binding bookingRejectBinding() {
+		return BindingBuilder.bind(bookingRejectQueue()).to(busRouteExchange()).with(routingKeyBookingReject)
+				.noargs();
     }
     
+	@Bean
+	Binding paymentProcessBinding() {
+		return BindingBuilder.bind(paymentProcessQueue()).to(busRouteExchange()).with(routingKeyPaymentProcess).noargs();
+	}
+	
+	@Bean
+	Binding paymentRollbackBinding() {
+		return BindingBuilder.bind(paymentRollbackQueue()).to(busRouteExchange()).with(routingKeyPaymentRollback).noargs();
+	}
+	
     @Bean
     public ConnectionFactory connectionFactory() {
         CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory(host);

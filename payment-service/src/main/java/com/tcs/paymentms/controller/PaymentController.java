@@ -1,5 +1,6 @@
 package com.tcs.paymentms.controller;
 
+import static com.tcs.paymentms.constants.MessageConstants.REFUND_SUCCESS;
 import static com.tcs.paymentms.constants.MessageConstants.SAVE_SUCCESS;
 
 import org.springframework.http.HttpStatus;
@@ -22,10 +23,16 @@ public class PaymentController {
 	private final PaymentService paymentService;
 
 	
-	@PostMapping("/payment")
+	@PostMapping("/savePayment")
 	public ResponseEntity<String> savePayment(@RequestBody BookingVo bookingDetails) {
 		paymentService.savePayment(bookingDetails);
 		return new ResponseEntity<>(SAVE_SUCCESS + bookingDetails.getBookingNumber(), HttpStatus.OK);
+	}
+	
+	@PostMapping("/refundPayment")
+	public ResponseEntity<String> refundPayment(@RequestBody BookingVo bookingDetails) {
+		paymentService.refundPayment(bookingDetails);
+		return new ResponseEntity<>(REFUND_SUCCESS + bookingDetails.getBookingNumber(), HttpStatus.OK);
 	}
 
 }

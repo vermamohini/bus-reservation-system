@@ -63,7 +63,7 @@ public class InventoryService implements RabbitListenerConfigurer {
 	@Value("${spring.rabbitmq.queue.inventory.debit}")
 	private String inventoryDebitQueue;
 	
-	@Value("${spring.rabbitmq.queue.inventory.creditt}")
+	@Value("${spring.rabbitmq.queue.inventory.credit}")
 	private String inventoryCreditQueue;
 	
 	@RabbitListener(queues = "${spring.rabbitmq.queue.inventory.debit}")
@@ -79,6 +79,7 @@ public class InventoryService implements RabbitListenerConfigurer {
 			String busNumber = bookingVo.getBusNumber();
 			BusInventory existingInventory = validateExistingInventory(busNumber, noOfSeats);
 			
+			LOGGER.info("Debiting inventory for booking number: {}", bookingVo.getBookingNumber());
 			existingInventory.setAvailableSeats(existingInventory.getAvailableSeats() - noOfSeats);
 			existingInventory.setLastUpdatedDate(new Timestamp(System.currentTimeMillis()));
 			busInventoryRepository.save(existingInventory);
@@ -112,6 +113,7 @@ public class InventoryService implements RabbitListenerConfigurer {
 		BusInventory existingInventory = busInventoryRepository.findById(busNumber)
                 .orElseThrow(()->new BusInventoryNotFoundException(ERR_MSG_NOT_FOUND + busNumber));
 		
+		LOGGER.info("Crediting inventory debited for booking number: {}", bookingVo.getBookingNumber());
 		existingInventory.setAvailableSeats(existingInventory.getAvailableSeats() + noOfSeats);
 		existingInventory.setLastUpdatedDate(new Timestamp(System.currentTimeMillis()));
 		busInventoryRepository.save(existingInventory);
@@ -125,15 +127,18 @@ public class InventoryService implements RabbitListenerConfigurer {
 	}
 	
 	public BusInventory validateExistingInventory(String busNumber, Integer noOfSeats) {
+		LOGGER.info("Validating existing inventory for bus number: {}", busNumber);
 		BusInventory existingInventory = busInventoryRepository.findById(busNumber)
                 .orElseThrow(()->new BusInventoryNotFoundException(ERR_MSG_NOT_FOUND + busNumber));
-		if (existingInventory.getAvailableSeats() >= noOfSeats) {
+		if (existingInventory.getAvailableSeats() < noOfSeats) {
 			throw new InventoryException(ERR_INSUFFICIENT_INVENTORY + existingInventory.getAvailableSeats()  + ERR_INSUFFICIENT_INVENTORY_CONTD + noOfSeats);
 		}
 		return existingInventory;
 	}
 	
 	public void triggerRollbackEvent(BookingVo bookingVo) {
+		LOGGER.info("Triggering rollback of transactions for booking number: {}", bookingVo.getBookingNumber());
+		
 		LOGGER.info("Inserting event to Exchange: {} with Routing key: {} and message {}:", exchange, routingKeyPaymentRollback, bookingVo);
 		rabbitTemplate.convertAndSend(exchange, routingKeyPaymentRollback, bookingVo);
 		

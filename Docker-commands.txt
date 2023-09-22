@@ -1,0 +1,12 @@
+docker login
+docker ps
+
+docker network create net-ms-api
+
+docker build . -t mohinimanu/config-service:1.0
+docker push mohinimanu/config-service:1.0
+docker run -d -p 8081:8081 --network net-ms-api --name config-service mohinimanu/config-service:1.0
+
+docker build . -t mohinimanu/eureka-naming-service:test-1.0
+docker push mohinimanu/eureka-naming-service:test-1.0
+docker run -d -p 8761:8761 --network net-ms-api --name eureka-naming-service mohinimanu/eureka-naming-service:test-1.0

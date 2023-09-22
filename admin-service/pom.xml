@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.tcs</groupId>
 	<artifactId>admin-service</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>test-1.0</version>
 	<name>admin-service</name>
 	<description>Admin service to fetch add edit delete bus model route</description>
 	<properties>

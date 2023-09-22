@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.tcs</groupId>
 	<artifactId>inventory-service</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>test-1.0</version>
 	<name>inventory-service</name>
 	<description>Inventory service to fetch edit bus inventory</description>
 	<properties>

@@ -1,10 +1,10 @@
-package com.tcs.busrouteinventoryms;
+package com.tcs.authms;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class BusRouteInventoryServiceApplicationTests {
+class AuthServiceApplicationTests {
 
 	@Test
 	void contextLoads() {

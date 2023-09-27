@@ -50,7 +50,8 @@ This service does not produces or consumes any message to other service.
 ## Booking-Service
 The purpose of this service to add a new booking and cancel any existing booking.
 
-While creating booking, this service calls "busInventory/seats/{busNumber}" endpoint on inventory-service to check if there is avaiable seats for particular bus number.  In case inventory-service is not avaiable then a retry is done five times after which a fallback inventory of 0 is returned. This is implemented using Resilience4j. 
+While creating booking, this service calls "busInventory/seats/{busNumber}" endpoint on inventory-service to check if there is available seats for particular bus number.  In case inventory-service is not available then a retry is done 5 times after which a fallback inventory of 0 is returned. This is implemented using Resilience4j. 
+The call to inventory-service from booking-service is implemented using spring-cloud-starter-openfeign.
 
 This service produces message to different queues. The details are listed below
 
@@ -154,7 +155,7 @@ The purpose of this service is to provide the database for persisting the data.
 ## RabbitMQ-Service
 This service acts as a message broker for processing different messages and enables asynchronous calls between different microservices.
 
-# Service Interaction Disagram
+# Service Interaction Diagram
 
 This section provides a pictorial representation of how different micorservices interacts through different queues of rabbit mq.
 
@@ -175,5 +176,14 @@ This section provides a pictorial representation of how different micorservices 
 ## Scenario where the booking is failed due to error in inventory service
 
 ![picture where the booking is rejected due to error in inventory service](image-5.png)
+
+# Database design
+Currently a single shared database is used for all the microservices.
+This section shows the database diagram for the bus-reservation-db and authdb.
+
+## bus-reservation-db
+
+## auth-db
+
 
 # bus-reservation-system

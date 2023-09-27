@@ -161,21 +161,23 @@ This section provides a pictorial representation of how different micorservices 
 
 ## Scenario where the booking is successful
 
-![picture for successful booking](image.png)
+![image](https://github.com/vermamohini/bus-reservation-system/assets/16957115/35dfc231-708d-47ed-b0cb-6fa316d7451a)
+
 
 ## Scenario where the booking is cancelled
 
-![picture for successful cancellation of booking](image-2.png)
+![image](https://github.com/vermamohini/bus-reservation-system/assets/16957115/cc658905-13f3-44e6-b13d-5a243659d547)
 
 
 ## Scenario where the booking is failed due to error in payment service
 
-![picture where error in payment service while booking](image-6.png)
+![image](https://github.com/vermamohini/bus-reservation-system/assets/16957115/9529d77a-85d4-4e66-a199-330d04a0430c)
 
 
 ## Scenario where the booking is failed due to error in inventory service
 
-![picture where the booking is rejected due to error in inventory service](image-5.png)
+![image](https://github.com/vermamohini/bus-reservation-system/assets/16957115/ef1afe2a-034b-4c6d-887a-fdd8ccb723e7)
+
 
 # Database design
 Currently a single shared database is used for all the microservices.

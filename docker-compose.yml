@@ -86,11 +86,11 @@ services:
       - logs:/var/log/
 
 
-  # zipkin-server:
-  #   container_name: zipkin-server
-  #   image: 'openzipkin/zipkin'
-  #   ports:
-  #     - '9411:9411'
+  zipkin-server:
+    container_name: zipkin-server
+    image: 'openzipkin/zipkin'
+    ports:
+      - '9411:9411'
 
 
   auth-service:
@@ -128,63 +128,67 @@ services:
       - logs:/var/log
 
 
-  # booking-service:
-  #   container_name: booking-service
-  #   build: # "context" and "dockerfile" fields have to be under "build"
-  #     context: ./booking-service
-  #     dockerfile: ./Dockerfile
-  #   deploy:
-  #     mode: replicated
-  #     replicas: 1
-  #   depends_on:
-  #     eureka-naming-service:
-  #       condition: service_started
-  #     config-service:
-  #       condition: service_started
-  #     mysql-service:
-  #       condition: service_started
-  #     rabbitmq-service:
-  #       condition: service_started
-  #   volumes:
-  #     - logs:/var/log
+  booking-service:
+    container_name: booking-service
+    build: # "context" and "dockerfile" fields have to be under "build"
+      context: ./booking-service
+      dockerfile: ./Dockerfile
+    deploy:
+      mode: replicated
+      replicas: 1
+    depends_on:
+      eureka-naming-service:
+        condition: service_healthy
+      config-service:
+        condition: service_healthy
+      mysql-service:
+        condition: service_started
+      rabbitmq-service:
+        condition: service_started
+    volumes:
+      - logs:/var/log
 
 
-  # inventory-service:
-  #   container_name: inventory-service
-  #   build: # "context" and "dockerfile" fields have to be under "build"
-  #     context: ./inventory-service
-  #     dockerfile: ./Dockerfile
-  #   deploy:
-  #     mode: replicated
-  #     replicas: 1
-  #   depends_on:
-  #     eureka-naming-service:
-  #       condition: service_started
-  #     config-service:
-  #       condition: service_started
-  #     mysql-service:
-  #       condition: service_started
-  #     rabbitmq-service:
-  #       condition: service_started
-  #   volumes:
-  #     - logs:/var/log
+  inventory-service:
+    container_name: inventory-service
+    build: # "context" and "dockerfile" fields have to be under "build"
+      context: ./inventory-service
+      dockerfile: ./Dockerfile
+    deploy:
+      mode: replicated
+      replicas: 1
+    depends_on:
+      eureka-naming-service:
+        condition: service_healthy
+      config-service:
+        condition: service_healthy
+      mysql-service:
+        condition: service_started
+      rabbitmq-service:
+        condition: service_started
+    volumes:
+      - logs:/var/log
 
 
-  # payment-service:
-  #   container_name: payment-service
-  #   build: # "context" and "dockerfile" fields have to be under "build"
-  #     context: ./payment-service
-  #     dockerfile: ./Dockerfile
-  #   deploy:
-  #     mode: replicated
-  #     replicas: 1
-  #   depends_on:
-  #     - eureka-naming-service
-  #     - config-service
-  #     - mysql-service
-  #     - rabbitmq-service
-  #   volumes:
-  #     - logs:/var/log
+  payment-service:
+    container_name: payment-service
+    build: # "context" and "dockerfile" fields have to be under "build"
+      context: ./payment-service
+      dockerfile: ./Dockerfile
+    deploy:
+      mode: replicated
+      replicas: 1
+    depends_on:
+      eureka-naming-service:
+        condition: service_healthy
+      config-service:
+        condition: service_healthy
+      mysql-service:
+        condition: service_started
+      rabbitmq-service:
+        condition: service_started
+    volumes:
+      - logs:/var/log
 
 
 volumes:

@@ -13,9 +13,20 @@ This project is a simple implementation of a bus booking system which is built u
 This section outlines different services that are used for the bus booking services.
 
 ## Auth-Service
-This service uses Spring security oauth2 to build an authorization server to authenticate your identity to provide access_token, which is used to request data from resource server in other microservices. It maintains 2 roles - ROLE_admin and ROLE_user for securing access to microservices. ROLE_admin has access to all end points in all microservices. ROLE_user has access to /saveBooking and /cancelBooking end points of Booking-service. GET end points are accessible without any authorization.
+This service uses Spring security oauth2 to build an authorization server to authenticate your identity to provide access_token, which is used to request data from resource server in other microservices. It is created using spring-cloud-starter-oauth2 and spring-cloud-starter-security. It maintains 2 roles - ROLE_admin and ROLE_user for securing access to microservices. ROLE_admin has access to all end points in all microservices. ROLE_user has access to /saveBooking and /cancelBooking end points of Booking-service. GET end points are accessible without any authorization. 
 
 This service does not produces or consumes any message to other service.
+
+### End points
+* GET oauth/token
+* Add the Request Headers as follows − Authorization − Basic Auth with your Client Id and Client secret.
+  
+* Add Request body with Content Type − application/x-www-form-urlencoded as follows
+* grant_type = password
+* username = your username
+* password = your password
+
+
 
 ## Admin-Service
 The purpose of this service is to provide endpoints to manage bus and route details. User can perform the following for bus and route details
@@ -29,12 +40,12 @@ The purpose of this service is to provide endpoints to manage bus and route deta
 This service does not produces or consumes any message to other service.
 
 ### End points
-GET api/v1/busRoutes 
-GET api/v1/busRoutes/{busNumber}
-GET api/v1/busRoutes/start/{startPoint}/end/{endPoint}
-POST api/v1/busRoutes -> Accessible to ROLE_admin
-PUT api/v1/busRoutes/{busNumber} -> Accessible to ROLE_admin
-DELETE api/v1/busRoutes/{busNumber} -> Accessible to ROLE_admin
+* GET api/v1/busRoutes 
+* GET api/v1/busRoutes/{busNumber}
+* GET api/v1/busRoutes/start/{startPoint}/end/{endPoint}
+* POST api/v1/busRoutes -> Accessible to ROLE_admin
+* PUT api/v1/busRoutes/{busNumber} -> Accessible to ROLE_admin
+* DELETE api/v1/busRoutes/{busNumber} -> Accessible to ROLE_admin
 
 ## Booking-Service
 The purpose of this service to add a new booking and cancel any existing booking.
@@ -61,11 +72,11 @@ The message in booking-reject-queue will come when anything fails while processi
 The message in booking-reject-queue will come when everything succeed while processing the booking e.g. payment processed and seats are reserved in inventory. As soon as a message appears in this queue, the booking-service consumes the message and marks the booking as CONFIRMED.
 
 ### End points
-GET api/v1/getInventory/{busNumber} -> calls "busInventory/seats/{busNumber}" endpoint on inventory-service
-GET api/v1/getBooking/busNumber/{busNumber}
-GET api/v1/getBooking/bookingNumber/{bookingNumber}
-POST api/v1/saveBooking -> Accessible to ROLE_admin and ROLE_user
-POST api/v1/cancelBooking -> Accessible to ROLE_admin and ROLE_user
+* GET api/v1/getInventory/{busNumber} -> calls "busInventory/seats/{busNumber}" endpoint on inventory-service
+* GET api/v1/getBooking/busNumber/{busNumber}
+* GET api/v1/getBooking/bookingNumber/{bookingNumber}
+* POST api/v1/saveBooking -> Accessible to ROLE_admin and ROLE_user
+* POST api/v1/cancelBooking -> Accessible to ROLE_admin and ROLE_user
 
 
 ## Inventory-Service ##
@@ -92,12 +103,12 @@ The message in this queue will come if a booking is canceled. The inventory-serv
 The message in this queue will come if payment against a given booking is successful. The inventory-service consumes this message and reduces number of seats booked from inventory (avaialable number of seats) for the given booking.
 
 ### End points
-GET api/v1/busInventory/all
-GET api/v1/busInventory/{busNumber}
-GET api/v1/busInventory/seats/{busNumber}
-POST api/v1/busInventory -> Accessible to ROLE_admin
-PUT api/v1/busInventory/{busNumber} -> Accessible to ROLE_admin
-DELETE api/v1/busInventory/{busNumber} -> Accessible to ROLE_admin
+* GET api/v1/busInventory/all
+* GET api/v1/busInventory/{busNumber}
+* GET api/v1/busInventory/seats/{busNumber}
+* POST api/v1/busInventory -> Accessible to ROLE_admin
+* PUT api/v1/busInventory/{busNumber} -> Accessible to ROLE_admin
+* DELETE api/v1/busInventory/{busNumber} -> Accessible to ROLE_admin
 
 ## Payment-Service
 The purpose of this service to record the payment against a booking. Since this is just a demo project, it does not integrate with any payment gateway and it is only limited to make an entry of payment amount in database along with status  
@@ -122,8 +133,8 @@ As soon as a new booking is made the booking-service publish a message in paymen
 The message in this queue comes if the booking is canceled or the inventory-service cannot process the booking. The payment-service reads from this queue and process the refund for the given booking.
 
 ### End points
-POST api/v1/savePayment -> Accessible to ROLE_admin
-POST api/v1/refundPayment -> Accessible to ROLE_admin
+* POST api/v1/savePayment -> Accessible to ROLE_admin
+* POST api/v1/refundPayment -> Accessible to ROLE_admin
 
 # Other Services
 These are the services which are acting as an enablers for the microservice architecture

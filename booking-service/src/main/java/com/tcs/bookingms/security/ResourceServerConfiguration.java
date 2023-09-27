@@ -1,4 +1,4 @@
-package com.tcs.adminms.security;
+package com.tcs.bookingms.security;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -13,7 +13,12 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
 
     private static final String RESOURCE_ID = "microservice";
     private static final String SECURED_ROLE_ADMIN = "hasRole('ROLE_admin')";
+    private static final String SECURED_ROLE_USER = "hasRole('ROLE_user')";
     private static final String SECURED_PATTERN = "/**";
+    private static final String SECURED_PATTERN_CONFIRM_BOOKING = "/confirmBooking";
+    private static final String SECURED_PATTERN_SAVE_BOOKING = "/saveBooking";
+    private static final String SECURED_PATTERN_CANCEL_BOOKING = "/cancelBooking";
+
 
     @Override
     public void configure(ResourceServerSecurityConfigurer resources) {
@@ -29,7 +34,13 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
                 .and()
                 .requestMatchers()                
                 .antMatchers(SECURED_PATTERN).and().authorizeRequests()
-                .antMatchers(SECURED_PATTERN)
-                .access(SECURED_ROLE_ADMIN);
+                .antMatchers(SECURED_PATTERN_CONFIRM_BOOKING)
+                .access(SECURED_ROLE_ADMIN).and().authorizeRequests()
+                .antMatchers(SECURED_PATTERN_CONFIRM_BOOKING).not()
+                .access(SECURED_ROLE_USER)
+                .antMatchers(SECURED_PATTERN_SAVE_BOOKING)
+                .access(SECURED_ROLE_ADMIN + " or " + SECURED_ROLE_USER)
+                .antMatchers(SECURED_PATTERN_CANCEL_BOOKING)
+                .access(SECURED_ROLE_ADMIN + " or " + SECURED_ROLE_USER);
     }
 }

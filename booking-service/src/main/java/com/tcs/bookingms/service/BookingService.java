@@ -23,6 +23,7 @@ import com.tcs.bookingms.entities.BookingDetails;
 import com.tcs.bookingms.entities.BookingStatus;
 import com.tcs.bookingms.entities.BookingStatusEnum;
 import com.tcs.bookingms.entities.BusRoute;
+import com.tcs.bookingms.entities.FullBookingDetails;
 import com.tcs.bookingms.entities.PassengerDetails;
 import com.tcs.bookingms.exceptions.EntityNotFoundException;
 import com.tcs.bookingms.repository.BookingDetailsRepository;
@@ -196,5 +197,45 @@ public class BookingService implements RabbitListenerConfigurer {
 		
 		LOGGER.info("Inserting event to Exchange: {} with Routing key: {} and message {}:", exchange, routingKeyInventoryCredit, bookingVo);
 		rabbitTemplate.convertAndSend(exchange, routingKeyInventoryCredit, bookingVo);	
+	}
+	
+	public List<FullBookingDetails> getBookingByBusNumber(String busNumber) {
+		LOGGER.info("Fetching bookings for bus number: {}", busNumber);
+		List<BookingDetails> bookingDetailsList = bookingDetailsRepository.findByBusNumber(busNumber);
+		
+		List<FullBookingDetails> fullBookingDetailsList = new ArrayList<FullBookingDetails>();
+		
+		for (BookingDetails bookingDetails : bookingDetailsList) {
+			FullBookingDetails fullBookingDetails = new FullBookingDetails();
+			fullBookingDetails.setBookingDate(bookingDetails.getBookingDate());
+			fullBookingDetails.setBookingNumber(bookingDetails.getBookingNumber());
+			fullBookingDetails.setBookingStatus(bookingStatusRepository.findByBookingNumberOrderByCreatedDateDesc(bookingDetails.getBookingNumber()).get(0).getBookingStatus());
+			fullBookingDetails.setBusNumber(busNumber);
+			fullBookingDetails.setEndPoint(bookingDetails.getEndPoint());
+			fullBookingDetails.setNoOfSeats(bookingDetails.getNoOfSeats());
+			fullBookingDetails.setPassengerIds(passengerDetailsRepository.findByBookingNumber(bookingDetails.getBookingNumber()).stream().map(obj -> obj.getPassengerId()).toList());
+			fullBookingDetails.setStartPoint(bookingDetails.getStartPoint());
+			fullBookingDetailsList.add(fullBookingDetails);
+		}
+		return fullBookingDetailsList;
+		
+	}
+	
+	public FullBookingDetails getBookingByBookingNumber(Integer bookingNumber) {
+		LOGGER.info("Fetching booking for booking number: {}", bookingNumber);
+		BookingDetails bookingDetails = bookingDetailsRepository.findById(bookingNumber)
+				.orElseThrow(() -> new EntityNotFoundException(ERR_MSG_BOOKING_NOT_FOUND + bookingNumber));
+		
+		FullBookingDetails fullBookingDetails = new FullBookingDetails();
+		fullBookingDetails.setBookingDate(bookingDetails.getBookingDate());
+		fullBookingDetails.setBookingNumber(bookingDetails.getBookingNumber());
+		fullBookingDetails.setBookingStatus(bookingStatusRepository.findByBookingNumberOrderByCreatedDateDesc(bookingDetails.getBookingNumber()).get(0).getBookingStatus());
+		fullBookingDetails.setBusNumber(bookingDetails.getBusNumber());
+		fullBookingDetails.setEndPoint(bookingDetails.getEndPoint());
+		fullBookingDetails.setNoOfSeats(bookingDetails.getNoOfSeats());
+		fullBookingDetails.setPassengerIds(passengerDetailsRepository.findByBookingNumber(bookingDetails.getBookingNumber()).stream().map(obj -> obj.getPassengerId()).toList());
+		fullBookingDetails.setStartPoint(bookingDetails.getStartPoint());
+		return fullBookingDetails;
+		
 	}
 }

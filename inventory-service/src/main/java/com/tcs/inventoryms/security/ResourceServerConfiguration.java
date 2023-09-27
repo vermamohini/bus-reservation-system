@@ -1,4 +1,4 @@
-package com.tcs.adminms.security;
+package com.tcs.inventoryms.security;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

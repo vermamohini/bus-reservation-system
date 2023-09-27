@@ -7,6 +7,8 @@ import static com.tcs.bookingms.constants.MessageConstants.CONFIRM_SUCCESS;
 import static com.tcs.bookingms.constants.MessageConstants.SAVE_SUCCESS;
 import static com.tcs.bookingms.constants.MessageConstants.SAVE_SUCCESS_CONTD;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tcs.bookingms.entities.BookingDetails;
+import com.tcs.bookingms.entities.FullBookingDetails;
 import com.tcs.bookingms.exceptions.InventoryException;
 import com.tcs.bookingms.proxies.BusInventoryProxy;
 import com.tcs.bookingms.service.BookingService;
@@ -56,6 +59,16 @@ public class BookingController {
 	public ResponseEntity<String> saveBooking(@RequestBody BookingDetails bookingDetails) {
 		bookingService.saveBooking(bookingDetails);
 		return ResponseEntity.ok().body(SAVE_SUCCESS + bookingDetails.getBusNumber() + SAVE_SUCCESS_CONTD + bookingDetails.getBookingNumber());
+	}
+	
+	@GetMapping("/getBooking/busNumber/{busNumber}")
+	public List<FullBookingDetails> getBookingByBusNumber(@PathVariable String busNumber) {
+		return bookingService.getBookingByBusNumber(busNumber);
+	}
+	
+	@GetMapping("/getBooking/bookingNumber/{bookingNumber}")
+	public FullBookingDetails getBookingByBookingNumber(@PathVariable Integer bookingNumber) {
+		return bookingService.getBookingByBookingNumber(bookingNumber);
 	}
 	
 	@PostMapping("/checkInventoryAndSaveBooking")

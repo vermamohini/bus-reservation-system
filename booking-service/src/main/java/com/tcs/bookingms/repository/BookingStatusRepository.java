@@ -9,5 +9,6 @@ import com.tcs.bookingms.entities.BookingStatus;
 public interface BookingStatusRepository extends JpaRepository<BookingStatus, Integer> {
 	
 	public List<BookingStatus> findByBookingNumber(Integer bookingNumber);
+	public List<BookingStatus> findByBookingNumberOrderByCreatedDateDesc(Integer bookingNumber);
 
 }

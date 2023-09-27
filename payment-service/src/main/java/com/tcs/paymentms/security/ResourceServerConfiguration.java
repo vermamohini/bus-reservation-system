@@ -1,4 +1,4 @@
-package com.tcs.adminms.security;
+package com.tcs.paymentms.security;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

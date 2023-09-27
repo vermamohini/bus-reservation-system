@@ -181,9 +181,12 @@ This section provides a pictorial representation of how different micorservices 
 Currently a single shared database is used for all the microservices.
 This section shows the database diagram for the bus-reservation-db and authdb.
 
-## bus-reservation-db
-
 ## auth-db
+![image](https://github.com/vermamohini/bus-reservation-system/assets/16957115/41b08726-4809-4f9c-b7d2-b442462291c0)
+
+
+## bu-reservation-db
+![image](https://github.com/vermamohini/bus-reservation-system/assets/16957115/cc20fed3-e189-452b-b3da-5d1f02ddb273)
 
 
 # bus-reservation-system

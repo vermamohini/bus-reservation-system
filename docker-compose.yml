@@ -2,7 +2,7 @@ version : '2.1'
 services:
 
   rabbitmq-service:
-    container_name: rabbitmq-service
+    # container_name: rabbitmq-service
     build: # "context" and "dockerfile" fields have to be under "build"
       context: ./rabbitmq-service
       dockerfile: ./Dockerfile
@@ -14,7 +14,7 @@ services:
 
 
   mysql-service:
-    container_name: mysql-service
+    # container_name: mysql-service
     image: mysql
     command: --default-authentication-plugin=mysql_native_password
     restart: always
@@ -33,7 +33,7 @@ services:
 
 
   config-service:
-    container_name: config-service
+    # container_name: config-service
     build: # "context" and "dockerfile" fields have to be under "build"
       context: ./config-service
       dockerfile: ./Dockerfile
@@ -50,7 +50,7 @@ services:
 
 
   eureka-naming-service:
-    container_name: eureka-naming-service
+    # container_name: eureka-naming-service
     build: # "context" and "dockerfile" fields have to be under "build"
       context: ./eureka-naming-service
       dockerfile: ./Dockerfile
@@ -70,7 +70,7 @@ services:
 
 
   gateway-service:
-    container_name: gateway-service
+    # container_name: gateway-service
     build: # "context" and "dockerfile" fields have to be under "build"
       context: ./gateway-service
       dockerfile: ./Dockerfile
@@ -95,14 +95,14 @@ services:
 
 
   zipkin-server:
-    container_name: zipkin-server
+    # container_name: zipkin-server
     image: 'openzipkin/zipkin'
     ports:
       - '9411:9411'
 
 
   auth-service:
-    container_name: auth-service
+    # container_name: auth-service
     build: # "context" and "dockerfile" fields have to be under "build"
       context: ./auth-service
       dockerfile: ./Dockerfile
@@ -118,7 +118,7 @@ services:
 
 
   admin-service:
-    container_name: admin-service
+    # container_name: admin-service
     build: # "context" and "dockerfile" fields have to be under "build"
       context: ./admin-service
       dockerfile: ./Dockerfile
@@ -137,7 +137,7 @@ services:
 
 
   booking-service:
-    container_name: booking-service
+    # container_name: booking-service
     build: # "context" and "dockerfile" fields have to be under "build"
       context: ./booking-service
       dockerfile: ./Dockerfile
@@ -158,7 +158,7 @@ services:
 
 
   inventory-service:
-    container_name: inventory-service
+    # container_name: inventory-service
     build: # "context" and "dockerfile" fields have to be under "build"
       context: ./inventory-service
       dockerfile: ./Dockerfile
@@ -179,7 +179,7 @@ services:
 
 
   payment-service:
-    container_name: payment-service
+    # container_name: payment-service
     build: # "context" and "dockerfile" fields have to be under "build"
       context: ./payment-service
       dockerfile: ./Dockerfile

@@ -1,4 +1,4 @@
-FROM openjdk:8-jdk-alpine
+FROM adoptopenjdk/maven-openjdk11
 
 #PLACEMENT OF THE EXECUTABLE [MICROSERVICE] ON THE IMAGE
 COPY target/booking-service-test-1.0.jar app.jar

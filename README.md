@@ -37,7 +37,11 @@ The purpose of this service is to provide endpoints to manage bus and route deta
 * edit
 * delete
 
-This service does not produces or consumes any message to other service.
+### Queues where messages are produced
+#### inventory-create-queue
+Whenever a new bus route is defined the service produces a message with number of seats on the bus route so that inventory-service creates inventory for the bus route.
+### Queues from where messages are consumed 
+This service does not consumes any message from other service.
 
 ### End points
 * GET api/v1/busRoutes 
@@ -102,6 +106,9 @@ The message in this queue will come if a booking is canceled. The inventory-serv
 
 #### inventory-debit-queue
 The message in this queue will come if payment against a given booking is successful. The inventory-service consumes this message and reduces number of seats booked from inventory (avaialable number of seats) for the given booking.
+
+### inventory-create-queue
+The message in this queue will appear whenever a new bus route is created using admin service. This service will read the message and create inventory for the bus route created.
 
 ### End points
 * GET api/v1/busInventory/all

@@ -63,6 +63,12 @@
 		"durable": true,
 		"auto_delete": false,
 		"arguments": {}
+	}, {
+		"name": "inventory-create-queue",
+		"vhost": "/",
+		"durable": true,
+		"auto_delete": false,
+		"arguments": {}
 	}],
 	"exchanges": [{
 		"name": "bus-reservation-exchange",
@@ -100,6 +106,13 @@
 		"destination": "inventory-debit-queue",
 		"destination_type": "queue",
 		"routing_key": "inventory-debit-routing-key",
+		"arguments": {}
+	}, {
+		"source": "bus-reservation-exchange",
+		"vhost": "/",
+		"destination": "inventory-create-queue",
+		"destination_type": "queue",
+		"routing_key": "inventory-create-routing-key",
 		"arguments": {}
 	}, {
 		"source": "bus-reservation-exchange",

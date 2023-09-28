@@ -20,11 +20,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tcs.bookingms.entities.BookingDetails;
-import com.tcs.bookingms.entities.FullBookingDetails;
 import com.tcs.bookingms.exceptions.InventoryException;
 import com.tcs.bookingms.proxies.BusInventoryProxy;
 import com.tcs.bookingms.service.BookingService;
 import com.tcs.bookingms.vo.BookingVo;
+import com.tcs.bookingms.vo.FullBookingDetailsVo;
 
 import feign.FeignException;
 import io.github.resilience4j.retry.annotation.Retry;
@@ -62,12 +62,12 @@ public class BookingController {
 	}
 	
 	@GetMapping("/getBooking/busNumber/{busNumber}")
-	public List<FullBookingDetails> getBookingByBusNumber(@PathVariable String busNumber) {
+	public List<FullBookingDetailsVo> getBookingByBusNumber(@PathVariable String busNumber) {
 		return bookingService.getBookingByBusNumber(busNumber);
 	}
 	
 	@GetMapping("/getBooking/bookingNumber/{bookingNumber}")
-	public FullBookingDetails getBookingByBookingNumber(@PathVariable Integer bookingNumber) {
+	public FullBookingDetailsVo getBookingByBookingNumber(@PathVariable Integer bookingNumber) {
 		return bookingService.getBookingByBookingNumber(bookingNumber);
 	}
 	

@@ -1,4 +1,4 @@
-package com.tcs.bookingms.entities;
+package com.tcs.bookingms.vo;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -8,7 +8,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class FullBookingDetails {
+public class FullBookingDetailsVo {
 	
 	private Integer bookingNumber;
 	

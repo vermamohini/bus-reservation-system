@@ -50,6 +50,12 @@ public class RabbitMqConfig {
 	@Value("${spring.rabbitmq.routingkey.inventory.debit}")
 	private String routingKeyInventoryDebit;
 	
+	@Value("${spring.rabbitmq.queue.inventory.create}")
+	private String inventoryCreateQueue;
+
+	@Value("${spring.rabbitmq.routingkey.inventory.create}")
+	private String routingKeyInventoryCreate;
+	
 
     
     @Value("${spring.rabbitmq.username}")
@@ -84,6 +90,10 @@ public class RabbitMqConfig {
         return new Queue(inventoryDebitQueue, true);
     }
     
+	@Bean
+	Queue inventoryCreateQueue() {
+		return new Queue(inventoryCreateQueue, true);
+	}
 
     
     @Bean
@@ -119,6 +129,11 @@ public class RabbitMqConfig {
 		return BindingBuilder.bind(inventoryDebitQueue()).to(busRouteExchange()).with(routingKeyInventoryDebit)
 				.noargs();
     }
+    
+	@Bean
+	Binding inventoryCreateBinding() {
+		return BindingBuilder.bind(inventoryCreateQueue()).to(busRouteExchange()).with(routingKeyInventoryCreate).noargs();
+	}
     
     
     @Bean

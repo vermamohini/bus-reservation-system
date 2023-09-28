@@ -3,6 +3,7 @@ package com.tcs.inventoryms.service;
 import static com.tcs.inventoryms.constants.ErrorConstants.ERR_INSUFFICIENT_INVENTORY;
 import static com.tcs.inventoryms.constants.ErrorConstants.ERR_INSUFFICIENT_INVENTORY_CONTD;
 import static com.tcs.inventoryms.constants.ErrorConstants.ERR_INVALID_NO_OF_SEATS;
+import static com.tcs.inventoryms.constants.ErrorConstants.ERR_MSG_ALREADY_EXISTS;
 import static com.tcs.inventoryms.constants.ErrorConstants.ERR_MSG_NOT_FOUND;
 
 import java.sql.Timestamp;
@@ -21,12 +22,14 @@ import org.springframework.stereotype.Component;
 import com.tcs.inventoryms.entities.BusInventory;
 import com.tcs.inventoryms.entities.InventoryOperationEnum;
 import com.tcs.inventoryms.entities.InventoryUpdateLog;
+import com.tcs.inventoryms.exceptions.BusInventoryAlreadyExistsException;
 import com.tcs.inventoryms.exceptions.BusInventoryNotFoundException;
 import com.tcs.inventoryms.exceptions.InvalidNoOfSeatsException;
 import com.tcs.inventoryms.exceptions.InventoryException;
 import com.tcs.inventoryms.repository.BusInventoryRepository;
 import com.tcs.inventoryms.repository.InventoryUpdateLogRepository;
 import com.tcs.inventoryms.vo.BookingVo;
+import com.tcs.inventoryms.vo.BusVo;
 
 import lombok.RequiredArgsConstructor;
 
@@ -66,6 +69,9 @@ public class InventoryService implements RabbitListenerConfigurer {
 	@Value("${spring.rabbitmq.queue.inventory.credit}")
 	private String inventoryCreditQueue;
 	
+	@Value("${spring.rabbitmq.queue.inventory.create}")
+	private String inventoryCreateQueue;
+	
 	@RabbitListener(queues = "${spring.rabbitmq.queue.inventory.debit}")
 	public void reducefromBusInventoryByBusNumber(BookingVo bookingVo) {
 		try {
@@ -98,7 +104,6 @@ public class InventoryService implements RabbitListenerConfigurer {
 			LOGGER.info("Exception in Debiting inventory for booking details: {}. Exception encountered : {}", bookingVo, ex);
 			triggerRollbackEvent(bookingVo);
 		}
-		
 	}
 	
 	@RabbitListener(queues = "${spring.rabbitmq.queue.inventory.credit}")
@@ -144,6 +149,34 @@ public class InventoryService implements RabbitListenerConfigurer {
 		
 		LOGGER.info("Inserting event to Exchange: {} with Routing key: {} and message {}:", exchange, routingKeyBookingReject, bookingVo);
 		rabbitTemplate.convertAndSend(exchange, routingKeyBookingReject, bookingVo);	
+	}
+	
+	@RabbitListener(queues = "${spring.rabbitmq.queue.inventory.create}")
+	public void insertBusInventoryForBusNumber(BusVo busVo) {
+		try {
+			LOGGER.info ("Received message: {} from event queue: {}", busVo, inventoryCreateQueue);
+			
+			Integer noOfSeats = busVo.getNoOfSeats();
+			if (noOfSeats == null) {
+				new InvalidNoOfSeatsException(ERR_INVALID_NO_OF_SEATS);
+			}
+			
+			String busNumber = busVo.getBusNumber();
+			BusInventory inventory = busInventoryRepository.findById(busNumber).orElse(null);
+			if (inventory == null) {
+				inventory = new BusInventory();
+				inventory.setBusNumber(busNumber);
+				inventory.setAvailableSeats(noOfSeats);
+				inventory.setLastUpdatedDate(new Timestamp(System.currentTimeMillis()));
+				busInventoryRepository.save(inventory);
+				
+			} else {
+				throw new BusInventoryAlreadyExistsException(ERR_MSG_ALREADY_EXISTS + busNumber);
+			}	
+			
+		} catch(final Exception ex) {
+			LOGGER.info("Exception in inserting inventory for bus : {}. Exception encountered : {}", busVo, ex);
+		}
 	}
 
 }

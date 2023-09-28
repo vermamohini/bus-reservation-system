@@ -23,7 +23,6 @@ import com.tcs.bookingms.entities.BookingDetails;
 import com.tcs.bookingms.entities.BookingStatus;
 import com.tcs.bookingms.entities.BookingStatusEnum;
 import com.tcs.bookingms.entities.BusRoute;
-import com.tcs.bookingms.entities.FullBookingDetails;
 import com.tcs.bookingms.entities.PassengerDetails;
 import com.tcs.bookingms.exceptions.EntityNotFoundException;
 import com.tcs.bookingms.repository.BookingDetailsRepository;
@@ -31,6 +30,7 @@ import com.tcs.bookingms.repository.BookingStatusRepository;
 import com.tcs.bookingms.repository.BusRouteRepository;
 import com.tcs.bookingms.repository.PassengerDetailsRepository;
 import com.tcs.bookingms.vo.BookingVo;
+import com.tcs.bookingms.vo.FullBookingDetailsVo;
 
 import lombok.RequiredArgsConstructor;
 
@@ -199,14 +199,14 @@ public class BookingService implements RabbitListenerConfigurer {
 		rabbitTemplate.convertAndSend(exchange, routingKeyInventoryCredit, bookingVo);	
 	}
 	
-	public List<FullBookingDetails> getBookingByBusNumber(String busNumber) {
+	public List<FullBookingDetailsVo> getBookingByBusNumber(String busNumber) {
 		LOGGER.info("Fetching bookings for bus number: {}", busNumber);
 		List<BookingDetails> bookingDetailsList = bookingDetailsRepository.findByBusNumber(busNumber);
 		
-		List<FullBookingDetails> fullBookingDetailsList = new ArrayList<FullBookingDetails>();
+		List<FullBookingDetailsVo> fullBookingDetailsList = new ArrayList<FullBookingDetailsVo>();
 		
 		for (BookingDetails bookingDetails : bookingDetailsList) {
-			FullBookingDetails fullBookingDetails = new FullBookingDetails();
+			FullBookingDetailsVo fullBookingDetails = new FullBookingDetailsVo();
 			fullBookingDetails.setBookingDate(bookingDetails.getBookingDate());
 			fullBookingDetails.setBookingNumber(bookingDetails.getBookingNumber());
 			fullBookingDetails.setBookingStatus(bookingStatusRepository.findByBookingNumberOrderByCreatedDateDesc(bookingDetails.getBookingNumber()).get(0).getBookingStatus());
@@ -221,12 +221,12 @@ public class BookingService implements RabbitListenerConfigurer {
 		
 	}
 	
-	public FullBookingDetails getBookingByBookingNumber(Integer bookingNumber) {
+	public FullBookingDetailsVo getBookingByBookingNumber(Integer bookingNumber) {
 		LOGGER.info("Fetching booking for booking number: {}", bookingNumber);
 		BookingDetails bookingDetails = bookingDetailsRepository.findById(bookingNumber)
 				.orElseThrow(() -> new EntityNotFoundException(ERR_MSG_BOOKING_NOT_FOUND + bookingNumber));
 		
-		FullBookingDetails fullBookingDetails = new FullBookingDetails();
+		FullBookingDetailsVo fullBookingDetails = new FullBookingDetailsVo();
 		fullBookingDetails.setBookingDate(bookingDetails.getBookingDate());
 		fullBookingDetails.setBookingNumber(bookingDetails.getBookingNumber());
 		fullBookingDetails.setBookingStatus(bookingStatusRepository.findByBookingNumberOrderByCreatedDateDesc(bookingDetails.getBookingNumber()).get(0).getBookingStatus());

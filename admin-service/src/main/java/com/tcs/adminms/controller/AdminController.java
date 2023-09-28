@@ -23,6 +23,7 @@ import com.tcs.adminms.entities.BusRoute;
 import com.tcs.adminms.exceptions.BusRouteAlreadyExistsException;
 import com.tcs.adminms.exceptions.BusRouteNotFoundException;
 import com.tcs.adminms.repository.BusRouteRepository;
+import com.tcs.adminms.service.AdminService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,6 +33,8 @@ import lombok.RequiredArgsConstructor;
 public class AdminController {
 	
 	private final BusRouteRepository busRouteRepository;
+	
+	private final AdminService adminService;
 	
 	@GetMapping("/busRoutes")
 	public List<BusRoute> getAllBusRoutes() {
@@ -47,15 +50,8 @@ public class AdminController {
 	
 	@PostMapping("/busRoutes")
 	public ResponseEntity<?> saveBusRoute(@RequestBody BusRoute route) {
-		
-		BusRoute existingRoute = busRouteRepository.findById(route.getBusNumber()).orElse(null);
-		if (existingRoute == null) {
-			busRouteRepository.save(route);
-			return new ResponseEntity<>(SAVE_SUCCESS + route.getBusNumber(), HttpStatus.OK);
-		}
-		else {
-			throw new BusRouteAlreadyExistsException(ERR_MSG_ALREADY_EXISTS + route.getBusNumber());
-		}	
+		adminService.saveBusRoute(route);
+		return new ResponseEntity<>(SAVE_SUCCESS + route.getBusNumber(), HttpStatus.OK);	
 	}
 	
 	@PutMapping("/busRoutes/{busNumber}")

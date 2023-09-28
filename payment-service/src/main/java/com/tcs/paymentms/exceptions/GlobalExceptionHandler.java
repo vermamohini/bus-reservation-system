@@ -29,5 +29,15 @@ public class GlobalExceptionHandler {
 		return new ErrorResponse(
 				HttpStatus.BAD_REQUEST.value(), ex.getMessage());
 	}
+	
+	@ExceptionHandler(value
+			= EntityNotFoundException.class)
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	public @ResponseBody ErrorResponse
+	handleException(EntityNotFoundException ex)
+	{
+		return new ErrorResponse(
+				HttpStatus.NOT_FOUND.value(), ex.getMessage());
+	}
 
 }

@@ -1,6 +1,9 @@
 package com.tcs.paymentms.service;
 
+
 import static com.tcs.paymentms.constants.ErrorConstants.ERR_MSG_ALREADY_EXISTS;
+import static com.tcs.paymentms.constants.ErrorConstants.ERR_MSG_PAYMENT_NOT_FOUND;
+import static com.tcs.paymentms.constants.ErrorConstants.ERR_MSG_PAYMENT_NOT_FOUND_FOR_BOOKING;
 
 import java.sql.Timestamp;
 
@@ -18,10 +21,12 @@ import org.springframework.stereotype.Component;
 import com.tcs.paymentms.entities.PaymentDetails;
 import com.tcs.paymentms.entities.PaymentStatus;
 import com.tcs.paymentms.entities.PaymentStatusEnum;
+import com.tcs.paymentms.exceptions.EntityNotFoundException;
 import com.tcs.paymentms.exceptions.PaymentAlreadyExistsException;
 import com.tcs.paymentms.repository.PaymentDetailsRepository;
 import com.tcs.paymentms.repository.PaymentStatusRepository;
 import com.tcs.paymentms.vo.BookingVo;
+import com.tcs.paymentms.vo.FullPaymentDetailsVo;
 
 import lombok.RequiredArgsConstructor;
 
@@ -119,6 +124,42 @@ public class PaymentService implements RabbitListenerConfigurer {
 		
 		LOGGER.info("Inserting event to Exchange: {} with Routing key: {} and message {}:", exchange, routingKeyBookingReject, bookingVo);
 		rabbitTemplate.convertAndSend(exchange, routingKeyBookingReject, bookingVo);	
+	}
+	
+	
+	
+	public FullPaymentDetailsVo getPaymentByBookingNumber(Integer bookingNumber) {
+		LOGGER.info("Fetching payment for booking number: {}", bookingNumber);
+		PaymentDetails paymentDetails = paymentDetailsRepository.findByBookingNumber(bookingNumber);
+		
+		if (paymentDetails == null) {
+			throw new EntityNotFoundException(ERR_MSG_PAYMENT_NOT_FOUND_FOR_BOOKING + bookingNumber);
+		} else {
+			FullPaymentDetailsVo fullPaymentDetails = new FullPaymentDetailsVo();
+			fullPaymentDetails.setPaymentDate(paymentDetails.getPaymentDate());
+			fullPaymentDetails.setBookingNumber(paymentDetails.getBookingNumber());
+			fullPaymentDetails.setPaymentStatus(paymentStatusRepository.findByPaymentNumberOrderByCreatedDateDesc(paymentDetails.getPaymentNumber()).get(0).getPaymentStatus());
+			fullPaymentDetails.setPaymentNumber(paymentDetails.getPaymentNumber());
+			fullPaymentDetails.setAmount(paymentDetails.getAmount());
+			return fullPaymentDetails;
+		}
+	}
+	
+	public FullPaymentDetailsVo getPaymentByPaymentNumber(Integer paymentNumber) {
+		LOGGER.info("Fetching payment for booking number: {}", paymentNumber);
+		PaymentDetails paymentDetails = paymentDetailsRepository.findById(paymentNumber).orElse(null);
+		
+		if (paymentDetails == null) {
+			throw new EntityNotFoundException(ERR_MSG_PAYMENT_NOT_FOUND + paymentNumber);
+		} else {
+			FullPaymentDetailsVo fullPaymentDetails = new FullPaymentDetailsVo();
+			fullPaymentDetails.setPaymentDate(paymentDetails.getPaymentDate());
+			fullPaymentDetails.setBookingNumber(paymentDetails.getBookingNumber());
+			fullPaymentDetails.setPaymentStatus(paymentStatusRepository.findByPaymentNumberOrderByCreatedDateDesc(paymentDetails.getPaymentNumber()).get(0).getPaymentStatus());
+			fullPaymentDetails.setPaymentNumber(paymentDetails.getPaymentNumber());
+			fullPaymentDetails.setAmount(paymentDetails.getAmount());
+			return fullPaymentDetails;
+		}
 	}
 
 }

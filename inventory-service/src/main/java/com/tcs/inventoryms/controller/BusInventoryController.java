@@ -1,6 +1,5 @@
 package com.tcs.inventoryms.controller;
 
-import static com.tcs.inventoryms.constants.ErrorConstants.ERR_MSG_ALREADY_EXISTS;
 import static com.tcs.inventoryms.constants.ErrorConstants.ERR_MSG_NOT_FOUND;
 import static com.tcs.inventoryms.constants.MessageConstants.DELETE_SUCCESS;
 import static com.tcs.inventoryms.constants.MessageConstants.SAVE_SUCCESS;
@@ -21,11 +20,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tcs.inventoryms.entities.BusInventory;
-import com.tcs.inventoryms.exceptions.BusInventoryAlreadyExistsException;
 import com.tcs.inventoryms.exceptions.BusInventoryNotFoundException;
 import com.tcs.inventoryms.repository.BusInventoryRepository;
 import com.tcs.inventoryms.service.InventoryService;
 import com.tcs.inventoryms.vo.BookingVo;
+import com.tcs.inventoryms.vo.BusVo;
 
 import lombok.RequiredArgsConstructor;
 
@@ -59,15 +58,9 @@ public class BusInventoryController {
 	}
 	
 	@PostMapping("/busInventory")
-	public ResponseEntity<?> saveBusInventory(@RequestBody BusInventory busInventory) {
-		BusInventory inventory = busInventoryRepository.findById(busInventory.getBusNumber()).orElse(null);
-		if (inventory == null) {
-			busInventory.setLastUpdatedDate(new Timestamp(System.currentTimeMillis()));
-			busInventoryRepository.save(busInventory);
-			return new ResponseEntity<>(SAVE_SUCCESS + busInventory.getBusNumber(), HttpStatus.OK);
-		} else {
-			throw new BusInventoryAlreadyExistsException(ERR_MSG_ALREADY_EXISTS + busInventory.getBusNumber());
-		}
+	public ResponseEntity<?> saveBusInventory(@RequestBody BusVo busVo) {
+		inventoryService.insertBusInventoryForBusNumber(busVo);
+		return new ResponseEntity<>(SAVE_SUCCESS + busVo.getBusNumber(), HttpStatus.OK);
 	}
 	
 	@PutMapping("/busInventory/{busNumber}")
@@ -88,7 +81,7 @@ public class BusInventoryController {
 		return new ResponseEntity<>(DELETE_SUCCESS + busNumber, HttpStatus.OK);
 	}
 	
-	@PutMapping("/busInventory/add")
+	@PostMapping("/busInventory/add")
 	public ResponseEntity<?> addToBusInventoryByBusNumber(@RequestBody BookingVo bookingVo) {
 		inventoryService.addToBusInventoryByBusNumber(bookingVo);
 		return new ResponseEntity<>(UPDATE_SUCCESS + bookingVo.getBusNumber(), HttpStatus.OK);

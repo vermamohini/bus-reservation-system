@@ -1,6 +1,5 @@
 package com.tcs.adminms.controller;
 
-import static com.tcs.adminms.constants.ErrorConstants.ERR_MSG_ALREADY_EXISTS;
 import static com.tcs.adminms.constants.ErrorConstants.ERR_MSG_NOT_FOUND;
 import static com.tcs.adminms.constants.MessageConstants.DELETE_SUCCESS;
 import static com.tcs.adminms.constants.MessageConstants.SAVE_SUCCESS;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tcs.adminms.entities.BusRoute;
-import com.tcs.adminms.exceptions.BusRouteAlreadyExistsException;
 import com.tcs.adminms.exceptions.BusRouteNotFoundException;
 import com.tcs.adminms.repository.BusRouteRepository;
 import com.tcs.adminms.service.AdminService;

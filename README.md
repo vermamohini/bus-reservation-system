@@ -103,7 +103,7 @@ This service produces message to different queues. The details are listed below:
 If for any reason if the inventory cannot be deducted for a given booking, then this service publish a message to the booking-reject-queue so that booking service can mark the booking as REJECTED. This can happen when number of available seats in inventory are less than requested seats in booking.
 
 #### booking-confirm-queue
-if the inventory is deducted for a given booking, then this service publish a message to the booking-confirm-queue so that booking service can mark the booking as CONFIRMED.
+If the inventory is deducted for a given booking, then this service publish a message to the booking-confirm-queue so that booking service can mark the booking as CONFIRMED.
 
 #### payment-rollback-queue
 If for any reason if the inventory cannot be deducted for a given booking,, the inventory-service publish a message in payment-rollback-queue, so that the payment-service can process the refund for the booking. This can happen when number of available seats in inventory are less than requested seats in booking.
@@ -113,7 +113,7 @@ If for any reason if the inventory cannot be deducted for a given booking,, the 
 The message in this queue will come if a booking is cancelled. The inventory-service consumes this message and add number of seats cancelled to inventory (available number of seats) for the given booking.
 
 #### inventory-debit-queue
-The message in this queue will come if payment against a given booking is successful. The inventory-service consumes this message and reduces number of seats booked from inventory (avaialable number of seats) for the given booking.
+The message in this queue will come if payment against a given booking is successful. The inventory-service consumes this message and reduces number of seats booked from inventory (available number of seats) for the given booking.
 
 #### inventory-create-queue
 The message in this queue will appear whenever a new bus route is created using admin-service. This service will read the message and create inventory for the bus route created.
@@ -134,7 +134,7 @@ The purpose of this service to record the payment against a booking. Since this 
 This service produces message to different queues. The details are listed below
 ### Queues where messages are produced
 #### inventory-debit-queue
-As soon as the payment for a given booking is processed successfully, this payment-service produces a message in this queue. The inventory-service consumes this message and reduces number of seats booked from inventory (avaialable number of seats) for the given booking.
+As soon as the payment for a given booking is processed successfully, this payment-service produces a message in this queue. The inventory-service consumes this message and reduces number of seats booked from inventory (available number of seats) for the given booking.
 
 #### booking-reject-queue
 If for any reason if the payment for a given booking is not successful, then this service publish a message to the booking-reject-queue so that booking service can mark the booking as rejected.
@@ -204,7 +204,7 @@ This section shows the database diagram for the bus-reservation-db and authdb.
 ![image](https://github.com/vermamohini/bus-reservation-system/assets/16957115/41b08726-4809-4f9c-b7d2-b442462291c0)
 
 
-## bu-reservation-db
+## bus-reservation-db
 ![image](https://github.com/vermamohini/bus-reservation-system/assets/16957115/cc20fed3-e189-452b-b3da-5d1f02ddb273)
 
 
